@@ -1,0 +1,9 @@
+{
+  "name": "MOVA — Journal alimentaire",
+  "short_name": "MOVA",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#f7f5ef",
+  "theme_color": "#e8ede2",
+  "icons": []
+}

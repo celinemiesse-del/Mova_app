@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#e8ede2">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="MOVA">
+  <title>MOVA — Journal alimentaire</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <style>
+    :root{--sage:#dfe8d8;--sage2:#cbd9c2;--deep:#405943;--ink:#28332a;--muted:#788176;--cream:#f7f5ef;--white:#fff;--line:#e8e9e2;--accent:#78936f}
+    *{box-sizing:border-box} body{margin:0;background:var(--cream);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+    button,input,select{font:inherit} button{cursor:pointer}
+    .app{max-width:540px;margin:auto;min-height:100dvh;padding:env(safe-area-inset-top) 16px calc(92px + env(safe-area-inset-bottom))}
+    header{padding:18px 4px 14px;display:flex;justify-content:space-between;align-items:center}
+    .brand{font-family:Georgia,serif;font-size:32px;font-weight:700;letter-spacing:-1.5px;color:var(--deep)}
+    .date{font-size:13px;color:var(--muted);margin-top:2px;text-transform:capitalize}
+    .avatar{width:40px;height:40px;border-radius:50%;background:var(--sage);display:grid;place-items:center;color:var(--deep);font-size:19px}
+    .hello{font-family:Georgia,serif;font-size:26px;margin:12px 0 4px;color:var(--deep)}
+    .sub{font-size:14px;color:var(--muted);margin:0 0 18px}
+    .card{background:var(--white);border:1px solid var(--line);border-radius:22px;padding:18px;margin-bottom:14px;box-shadow:0 4px 18px #344b3210}
+    .cal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+    .eyebrow{font-size:12px;color:var(--muted);font-weight:700;letter-spacing:.07em;text-transform:uppercase}
+    .goal{font-size:13px;color:var(--muted)}
+    .calories{font-size:36px;font-weight:750;letter-spacing:-1.5px;color:var(--deep)}
+    .remaining{font-size:13px;color:var(--muted);margin-top:1px}
+    .bar{height:9px;background:#edf0e9;border-radius:20px;overflow:hidden;margin:14px 0 17px}
+    .bar>span{display:block;height:100%;width:0;background:linear-gradient(90deg,#9db592,#5e8057);border-radius:20px;transition:width .2s}
+    .macros{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+    .macro{background:#f7f8f4;border-radius:14px;padding:11px 10px}
+    .macro strong{display:block;font-size:17px;margin-top:5px;color:var(--deep)}
+    .macro small{font-size:11px;color:var(--muted)}
+    .section-title{display:flex;justify-content:space-between;align-items:center;margin:22px 3px 10px}
+    .section-title h2{font-family:Georgia,serif;font-size:21px;color:var(--deep);margin:0}
+    .meal{background:white;border:1px solid var(--line);border-radius:18px;padding:14px;margin-bottom:10px}
+    .meal-top{display:flex;justify-content:space-between;align-items:center}
+    .meal-name{font-weight:700;font-size:15px}
+    .meal-total{font-size:12px;color:var(--muted)}
+    .food{display:flex;justify-content:space-between;gap:8px;padding:11px 0;border-top:1px solid #f0f1ec;margin-top:10px}
+    .food:first-of-type{margin-top:12px}
+    .food-name{font-size:14px;font-weight:600}
+    .food-meta{font-size:12px;color:var(--muted);margin-top:3px}
+    .food-kcal{text-align:right;font-size:13px;font-weight:700;white-space:nowrap}
+    .delete{border:0;background:none;color:#a0a79b;font-size:18px;padding:0 0 0 8px}
+    .add-meal{border:1px dashed #b9c7b1;background:#f7f9f4;color:var(--deep);border-radius:13px;padding:11px;width:100%;font-weight:650;margin-top:9px}
+    .fab{position:fixed;right:max(22px,calc((100vw - 540px)/2 + 22px));bottom:calc(88px + env(safe-area-inset-bottom));border:0;border-radius:50px;background:var(--deep);color:white;padding:15px 20px;font-weight:700;box-shadow:0 8px 22px #40594340}
+    nav{position:fixed;bottom:0;left:0;right:0;background:#fffffff0;backdrop-filter:blur(14px);border-top:1px solid var(--line);padding:10px 12px calc(10px + env(safe-area-inset-bottom));display:flex;justify-content:center;gap:4px}
+    nav button{border:0;background:transparent;color:#8a9286;padding:8px 12px;border-radius:14px;font-size:11px;min-width:70px}
+    nav button.active{background:var(--sage);color:var(--deep);font-weight:700}
+    nav span{display:block;font-size:19px;margin-bottom:3px}
+    .modal-back{position:fixed;inset:0;background:#18201866;display:none;align-items:flex-end;justify-content:center;padding:12px;z-index:5}
+    .modal-back.open{display:flex}
+    .modal{background:var(--cream);border-radius:24px 24px 18px 18px;width:min(100%,520px);padding:20px;max-height:90dvh;overflow:auto}
+    .modal h2{font-family:Georgia,serif;color:var(--deep);margin:0 0 6px;font-size:24px}
+    .hint{color:var(--muted);font-size:12px;margin:0 0 16px}
+    label{display:block;font-size:12px;font-weight:700;color:#687365;margin:12px 0 6px}
+    input,select{width:100%;border:1px solid #dfe4d9;border-radius:12px;background:white;padding:13px;color:var(--ink);outline:none}
+    .grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    .actions{display:flex;gap:10px;margin-top:18px}
+    .actions button{flex:1;padding:13px;border-radius:13px;border:0;font-weight:700}
+    .cancel{background:#e9ede5;color:var(--deep)}.save{background:var(--deep);color:white}
+    .empty{font-size:13px;color:#92998e;padding:12px 0 2px}
+    .toast{position:fixed;bottom:105px;left:50%;transform:translateX(-50%);background:#26362a;color:white;padding:10px 15px;border-radius:20px;font-size:13px;opacity:0;pointer-events:none;transition:opacity .2s}
+    .toast.show{opacity:1}
+    .notice{font-size:11px;color:#92998e;text-align:center;margin:20px 8px}
+    @media(min-width:600px){body{padding:20px 0}.app{background:var(--cream)}}
+  </style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <div><div class="brand">mova.</div><div class="date" id="today"></div></div>
+    <div class="avatar">✿</div>
+  </header>
+  <h1 class="hello">Bonjour 🌿</h1>
+  <p class="sub">Chaque petit pas compte. Voici ta journée.</p>
+  <section class="card">
+    <div class="cal-head"><div class="eyebrow">Mon énergie aujourd'hui</div><button id="goalBtn" style="border:0;background:none;color:var(--accent);font-size:12px;font-weight:700">Objectif ⚙</button></div>
+    <div class="calories"><span id="consumed">0</span> <span style="font-size:15px;font-weight:500;color:var(--muted)">kcal</span></div>
+    <div class="remaining"><span id="remaining">2000</span> kcal restantes sur <span id="goalText">2000</span></div>
+    <div class="bar"><span id="progress"></span></div>
+    <div class="macros">
+      <div class="macro"><small>PROTÉINES</small><strong><span id="protein">0</span> g</strong></div>
+      <div class="macro"><small>GLUCIDES</small><strong><span id="carbs">0</span> g</strong></div>
+      <div class="macro"><small>LIPIDES</small><strong><span id="fat">0</span> g</strong></div>
+    </div>
+  </section>
+  <div class="section-title"><h2>Mon journal</h2><span class="eyebrow" id="foodCount">0 aliment</span></div>
+  <div id="meals"></div>
+  <p class="notice">MOVA est un outil de suivi, pas un dispositif médical. Les valeurs saisies dépendent des informations nutritionnelles des aliments.</p>
+</div>
+<button class="fab" id="openAdd">＋ Ajouter</button>
+<nav>
+  <button class="active"><span>⌂</span>Journal</button>
+  <button id="recipesNav"><span>♡</span>Recettes</button>
+  <button id="statsNav"><span>▥</span>Stats</button>
+  <button id="profileNav"><span>☻</span>Profil</button>
+</nav>
+<div class="modal-back" id="modalBack">
+  <div class="modal">
+    <h2 id="modalTitle">Ajouter un aliment</h2>
+    <p class="hint">Entre les valeurs indiquées sur l'emballage, pour 100 g. MOVA calcule le reste.</p>
+    <form id="foodForm">
+      <label for="foodName">Nom de l'aliment</label><input id="foodName" required maxlength="70" placeholder="Ex. Yaourt nature">
+      <label for="mealType">Repas</label><select id="mealType"><option>Petit-déjeuner</option><option>Déjeuner</option><option>Dîner</option><option>Collation</option></select>
+      <div class="grid2">
+        <div><label for="grams">Quantité (g)</label><input id="grams" type="number" min="1" max="5000" value="100" required></div>
+        <div><label for="kcal">Calories / 100 g</label><input id="kcal" type="number" min="0" max="1000" step="0.1" required placeholder="Ex. 62"></div>
+        <div><label for="p">Protéines / 100 g</label><input id="p" type="number" min="0" max="100" step="0.1" value="0"></div>
+        <div><label for="c">Glucides / 100 g</label><input id="c" type="number" min="0" max="100" step="0.1" value="0"></div>
+        <div><label for="f">Lipides / 100 g</label><input id="f" type="number" min="0" max="100" step="0.1" value="0"></div>
+      </div>
+      <div class="actions"><button type="button" class="cancel" id="closeModal">Annuler</button><button type="submit" class="save">Ajouter au journal</button></div>
+    </form>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+<script>
+const MEALS=["Petit-déjeuner","Déjeuner","Dîner","Collation"];
+const $=id=>document.getElementById(id);
+let foods=JSON.parse(localStorage.getItem("mova-foods")||"[]");
+let goal=Number(localStorage.getItem("mova-goal")||2000);
+const fmt=n=>Math.round(n*10)/10;
+const today=new Date().toISOString().slice(0,10);
+$("today").textContent=new Intl.DateTimeFormat("fr-BE",{weekday:"long",day:"numeric",month:"long"}).format(new Date());
+function persist(){localStorage.setItem("mova-foods",JSON.stringify(foods));render()}
+function render(){
+  const totals=foods.reduce((a,x)=>({k:a.k+x.kcal,p:a.p+x.p,c:a.c+x.c,f:a.f+x.f}),{k:0,p:0,c:0,f:0});
+  $("consumed").textContent=Math.round(totals.k);$("remaining").textContent=Math.round(goal-totals.k);$("goalText").textContent=goal;
+  $("protein").textContent=fmt(totals.p);$("carbs").textContent=fmt(totals.c);$("fat").textContent=fmt(totals.f);
+  $("progress").style.width=Math.min(100,Math.max(0,totals.k/goal*100))+"%";
+  $("foodCount").textContent=foods.length+" aliment"+(foods.length>1?"s":"");
+  $("meals").innerHTML=MEALS.map((m,i)=>{
+    const arr=foods.filter(x=>x.meal===m),sum=arr.reduce((a,x)=>a+x.kcal,0);
+    return `<section class="meal"><div class="meal-top"><div class="meal-name">${["☀️","🥗","🌙","🍏"][i]} ${m}</div><div class="meal-total">${Math.round(sum)} kcal</div></div>${arr.length?arr.map(x=>`<div class="food"><div><div class="food-name">${escapeHtml(x.name)}</div><div class="food-meta">${x.grams} g · P ${fmt(x.p)} g · G ${fmt(x.c)} g · L ${fmt(x.f)} g</div></div><div style="display:flex;align-items:center"><div class="food-kcal">${Math.round(x.kcal)} kcal</div><button class="delete" aria-label="Supprimer" onclick="removeFood('${x.id}')">×</button></div></div>`).join(""):`<div class="empty">Aucun aliment ajouté pour le moment.</div>`}<button class="add-meal" onclick="openModal('${m}')">＋ Ajouter un aliment</button></section>`;
+  }).join("");
+}
+function escapeHtml(s){return s.replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+function removeFood(id){foods=foods.filter(x=>x.id!==id);persist();showToast("Aliment supprimé")}
+function openModal(meal="Petit-déjeuner"){$("mealType").value=meal;$("modalBack").classList.add("open");$("foodName").focus()}
+function closeModal(){$("modalBack").classList.remove("open")}
+function showToast(t){$("toast").textContent=t;$("toast").classList.add("show");setTimeout(()=>$("toast").classList.remove("show"),1800)}
+$("openAdd").onclick=()=>openModal();$("closeModal").onclick=closeModal;
+$("modalBack").onclick=e=>{if(e.target===$("modalBack"))closeModal()};
+$("foodForm").onsubmit=e=>{
+  e.preventDefault();const g=Number($("grams").value),factor=g/100;
+  const values=["kcal","p","c","f"].map(id=>Number($(id).value||0));
+  if(g<=0||values.some(v=>v<0)){showToast("Vérifie les quantités");return}
+  foods.push({id:crypto.randomUUID?crypto.randomUUID():String(Date.now()),name:$("foodName").value.trim(),meal:$("mealType").value,grams:g,kcal:fmt(values[0]*factor),p:fmt(values[1]*factor),c:fmt(values[2]*factor),f:fmt(values[3]*factor)});
+  persist();closeModal();$("foodForm").reset();$("grams").value=100;$("p").value=$("c").value=$("f").value=0;showToast("Ajouté à ton journal 🌿");
+};
+$("goalBtn").onclick=()=>{const v=prompt("Ton objectif calorique quotidien (kcal) :",goal);if(v!==null&&Number(v)>0&&Number(v)<10000){goal=Math.round(Number(v));localStorage.setItem("mova-goal",goal);render()}};
+["recipesNav","statsNav","profileNav"].forEach(id=>$(id).onclick=()=>showToast("Cette rubrique arrive dans une prochaine version 💚"));
+render();
+if("serviceWorker" in navigator){window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js").catch(()=>{}))}
+</script>
+</body>
+</html>
